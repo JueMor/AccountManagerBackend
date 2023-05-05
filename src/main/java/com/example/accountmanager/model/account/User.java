@@ -5,9 +5,9 @@ import com.example.accountmanager.datatypes.HideId;
 import com.example.accountmanager.datatypes.Name;
 import com.example.accountmanager.role.Role;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.Period;

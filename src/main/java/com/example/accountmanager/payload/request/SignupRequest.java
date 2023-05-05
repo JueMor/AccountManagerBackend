@@ -3,9 +3,9 @@ package com.example.accountmanager.payload.request;
 import com.example.accountmanager.datatypes.Address;
 import com.example.accountmanager.datatypes.Name;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.Set;
 

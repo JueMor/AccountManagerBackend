@@ -1,6 +1,5 @@
 package com.example.accountmanager.role;
-
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "roles")

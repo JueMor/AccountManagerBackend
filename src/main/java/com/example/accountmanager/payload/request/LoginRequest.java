@@ -1,6 +1,6 @@
 package com.example.accountmanager.payload.request;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 public class LoginRequest {
     @NotBlank

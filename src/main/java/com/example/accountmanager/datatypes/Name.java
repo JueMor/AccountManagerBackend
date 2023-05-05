@@ -1,7 +1,6 @@
 package com.example.accountmanager.datatypes;
 
-import javax.persistence.*;
-import javax.validation.constraints.Size;
+import jakarta.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
 
