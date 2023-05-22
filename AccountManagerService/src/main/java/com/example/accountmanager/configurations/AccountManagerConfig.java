@@ -42,7 +42,7 @@ public class AccountManagerConfig {
             Optional<Role> role = roleRepository.findByName(ERole.ROLE_ADMIN);
 
             if (role.isPresent()) {
-                Optional<User> adminAccounts = userRepository.findByRoles(role.get());
+                List<User> adminAccounts = userRepository.findUsersByRolesIn(new HashSet<>(Collections.singletonList(role.get())));
 
                 if (adminAccounts.isEmpty()) {
                     Name name = new Name("Jürgen", "Moroskow");
