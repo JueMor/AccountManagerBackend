@@ -1,18 +1,41 @@
 version: "1"
 
 services:
-  account-manager-backend:
+  zipkin:
+    container_name: zipkin
+    image: openzipkin/zipkin
+    extra_hosts: [ 'host.docker.internal:host-gateway' ]
+    ports:
+      - 9411:9411
+  discovery-service:
     build:
-      context: ./AccountManagerService
+      context: ./DiscoveryServer
+    ports:
+      - 8061:8061
+    healthcheck:
+      test: curl --fail http://localhost:8061/eureka/v2/apps || exit 1
+      interval: 4s
+      timeout: 2s
+      retries: 3
+  account-service:
+    build:
+      context: ./account-service
     ports:
       - 8080:8080
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+      account-manager-db:
+        condition: service_started
     environment:
       - SPRING_DATASOURCE_URL=jdbc:mysql://account-manager-db:3306/neon?allowPublicKeyRetrieval=true&autoReconnect=true&useSSL=false
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=root
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
-    depends_on:
-      - account-manager-db
+      - SPRING_PROFILES_ACTIVE=docker
+    links:
+      - discovery-service
+      - zipkin
   account-manager-db:
     image: mysql
     expose:
@@ -20,3 +43,25 @@ services:
     environment:
       - MYSQL_DATABASE=neon
       - MYSQL_ROOT_PASSWORD=root
+  gateway-service:
+    build:
+      context: ./GatewayService
+    ports:
+      - 8060:8060
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    links:
+      - discovery-service
+      - account-service
+      - zipkin
+  account-service-frontend:
+    image: account-frontend
+    ports:
+      - 4200:4200
+  proxy-service:
+    image: proxy-service
+    ports:
+      - 3128:3128

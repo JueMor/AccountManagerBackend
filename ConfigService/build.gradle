@@ -1,0 +1,25 @@
+plugins {
+    id 'org.springframework.boot' version '3.0.6'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'java'
+}
+
+group = 'com.example.config'
+version = '0.0.1-Config'
+sourceCompatibility = '19'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.9.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+
+    // https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-config-server
+    implementation group: 'org.springframework.cloud', name: 'spring-cloud-config-server', version: '4.0.2'
+}
+
+test {
+    useJUnitPlatform()
+}

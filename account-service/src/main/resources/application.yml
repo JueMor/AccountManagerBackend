@@ -1,0 +1,38 @@
+server:
+  port: 8080
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://discovery-service:8061/eureka/
+  instance:
+    prefer-ip-address: true
+
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%X{traceId:-},%X{spanId:-}] ${LOG_LEVEL_PATTERN:-%5p} %m%n"
+
+springdoc:
+  packagesToScan: com.example.accountmanager
+
+spring:
+  output:
+    ansi:
+      enabled: always
+  application:
+    name: account-service
+  cloud:
+    config:
+      enabled: false
+
+jwt:
+  secret: ZSXRrdM9NeapZw7ea7TPt8Vu2T7rDD3tRhN8BPgh
+  validity: 300000
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: http://zipkin:9411/api/v2/spans

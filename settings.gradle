@@ -1,0 +1,5 @@
+rootProject.name = 'AccountManager'
+include 'account-service'
+include 'DiscoveryServer'
+include 'ConfigService'
+include 'GatewayService'
