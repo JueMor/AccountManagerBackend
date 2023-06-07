@@ -14,6 +14,8 @@ logging:
 
 springdoc:
   packagesToScan: com.example.accountmanager
+  api-docs:
+    path: /account/v3/api-docs
 
 spring:
   output:
