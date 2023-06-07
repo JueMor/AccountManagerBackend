@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -30,13 +31,23 @@ public class WebSecurityConfiguration {
     }
 
     @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring().requestMatchers(
+                "/v3/api-docs/**",
+                "/swagger-ui.html",
+                "/swagger-ui/**");
+    }
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
         // We don't need CSRF for this example
         http.cors().and().csrf().disable()
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeHttpRequests(request -> request.
-                        requestMatchers("/api/auth/**", "/api/test/**").permitAll()
+                        requestMatchers(
+                                "account/api/auth/**",
+                                "account/api/test/**")
+                        .permitAll()
                         .anyRequest().authenticated());
 
         // Add a filter to validate the tokens with every request

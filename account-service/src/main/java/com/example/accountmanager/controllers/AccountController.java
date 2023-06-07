@@ -12,7 +12,7 @@ import java.util.List;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/account")
+@RequestMapping("/account/api/user")
 public class AccountController {
 
     private final AccountService accountService;

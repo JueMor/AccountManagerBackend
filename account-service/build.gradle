@@ -62,10 +62,9 @@ dependencies {
 	// https://mvnrepository.com/artifact/io.opentelemetry/opentelemetry-exporter-zipkin
 	implementation group: 'io.opentelemetry', name: 'opentelemetry-exporter-zipkin', version: '1.19.0'
 
-	// https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webflux-ui
-	implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webflux-ui', version: '2.1.0'
-	// https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webflux-api
-	testImplementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webflux-api', version: '2.1.0'
+	// https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui
+	implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.1.0'
+
 
 	// https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-netflix-eureka-client
 	implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-eureka-client', version: '4.0.1'
