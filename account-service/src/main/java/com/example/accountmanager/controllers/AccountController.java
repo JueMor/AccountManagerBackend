@@ -22,14 +22,14 @@ public class AccountController {
         this.accountService = accountService;
     }
 
-    @GetMapping("/all")
+    @GetMapping("/")
     @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
     public ResponseEntity<List<User>> getAccounts(){
         List<User> users = accountService.getAccounts();
         return new ResponseEntity<List<User>>(users, HttpStatus.OK);
     }
 
-    @PostMapping("/add")
+    @PostMapping("/")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<User> addNewAccount(@RequestBody User user){
         User newUser = accountService.addNewAccount(user);
@@ -37,7 +37,7 @@ public class AccountController {
         return new ResponseEntity<>(newUser, HttpStatus.CREATED);
     }
 
-    @PutMapping("/update")
+    @PutMapping("/")
     @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
     public ResponseEntity<User> updateAccount(@RequestBody User user){
         User updateUser = accountService.updateAccount(user);
@@ -45,7 +45,7 @@ public class AccountController {
         return new ResponseEntity<>(updateUser, HttpStatus.OK);
     }
 
-    @DeleteMapping("delete/{email}")
+    @DeleteMapping("{email}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteAccount(@PathVariable("email") String email){
         accountService.deleteAccount(email);
