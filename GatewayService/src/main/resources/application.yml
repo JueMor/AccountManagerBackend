@@ -13,7 +13,7 @@ logging:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%X{traceId:-},%X{spanId:-}] ${LOG_LEVEL_PATTERN:-%5p} %m%n"
 
 springdoc:
-  packagesToScan: com.example
+  packagesToScan: com.juemor.gateway
   enable-native-support: true
   api-docs:
     enabled: true
@@ -32,6 +32,9 @@ spring:
     gateway:
       default-filters:
         - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
+        - SetResponseHeader=Access-Control-Allow-Origin, *
+        - SetResponseHeader=Access-Control-Allow-Methods, *
+        - SetResponseHeader=Access-Control-Expose-Headers, *
       globalcors:
         add-to-simple-url-handler-mapping: true
         corsConfigurations:
@@ -44,6 +47,16 @@ spring:
               - GET
               - POST
               - DELETE
+              - PUT
+      routes:
+        - id: account-service
+          uri: lb://account-service
+          predicates:
+            - Path=/account/api/**
+        - id: account-service-openapi
+          uri: lb://account-service
+          predicates:
+            - Path=/account/v3/api-docs
   output:
     ansi:
       enabled: always

@@ -1,4 +1,4 @@
-package org.example.config;
+package org.juemor.gateway.config;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
