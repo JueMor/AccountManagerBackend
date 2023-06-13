@@ -3,7 +3,6 @@ package com.example.accountmanager.controllers;
 import com.example.accountmanager.payload.request.UserRequest;
 import com.example.accountmanager.payload.response.UserResponse;
 import com.example.accountmanager.mapper.UserMapper;
-import com.example.accountmanager.model.account.User;
 import com.example.accountmanager.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,7 +28,7 @@ public class UserController {
 
     @GetMapping("/")
     @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
-    public ResponseEntity<List<UserResponse>> getAccounts(){
+    public ResponseEntity<List<UserResponse>> getUsers(){
         List<UserResponse> userResponses = userService
                 .getUsers()
                 .stream()
@@ -41,7 +40,7 @@ public class UserController {
 
     @PostMapping("/")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<UserResponse> addAccount(@RequestBody UserRequest request){
+    public ResponseEntity<UserResponse> addUser(@RequestBody UserRequest request){
         UserResponse userResponse = userMapper.toResponse(userService.addUser(request));
 
         return new ResponseEntity<>(userResponse, HttpStatus.CREATED);
@@ -49,7 +48,7 @@ public class UserController {
 
     @PutMapping("/")
     @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
-    public ResponseEntity<UserResponse> updateAccount(@RequestBody UserRequest request){
+    public ResponseEntity<UserResponse> updateUser(@RequestBody UserRequest request){
         UserResponse userResponse = userMapper.toResponse(userService.updateUser(request));
 
         return new ResponseEntity<>(userResponse, HttpStatus.OK);
@@ -57,7 +56,7 @@ public class UserController {
 
     @DeleteMapping("{email}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> deleteAccount(@PathVariable("email") String email){
+    public ResponseEntity<?> deleteUser(@PathVariable("email") String email){
         userService.deleteUser(email);
 
         return new ResponseEntity<>(HttpStatus.OK);
