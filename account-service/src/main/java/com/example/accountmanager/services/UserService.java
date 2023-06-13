@@ -1,8 +1,10 @@
 package com.example.accountmanager.services;
 
 import com.example.accountmanager.datatypes.Name;
+import com.example.accountmanager.mapper.UserMapper;
 import com.example.accountmanager.model.account.User;
 import com.example.accountmanager.model.account.UserRepository;
+import com.example.accountmanager.payload.request.UserRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,14 +15,16 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class AccountService {
+public class UserService {
 
-    Logger logger = LoggerFactory.getLogger(AccountService.class);
+    Logger logger = LoggerFactory.getLogger(UserService.class);
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     @Autowired
-    public AccountService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, UserMapper userMapper) {
         this.userRepository = userRepository;
+        this.userMapper = userMapper;
     }
 
     public boolean login(User user){
@@ -34,7 +38,7 @@ public class AccountService {
         throw new IllegalStateException("incorrect username or password");
     }
 
-    public List<User> getAccounts() {
+    public List<User> getUsers() {
         return userRepository.findAll();
     }
 
@@ -43,35 +47,34 @@ public class AccountService {
         return account.orElse(null);
     }
 
-    public User addNewAccount(User user) {
+    public User addUser(UserRequest request) {
+        User user = userMapper.toUser(request);
         Optional<User> accountByEmail = userRepository.findByEmail(user.getEmail());
         if (accountByEmail.isPresent()) {
             throw new IllegalStateException("email taken");
         }
-
-        logger.info(user.getEmail());
-        logger.info(user.getPassword());
 
         userRepository.save(user);
 
         return user;
     }
 
-    public void deleteAccount(String email) {
+    public void deleteUser(String email) {
         Optional<User> deleteAccount = userRepository.findByEmail(email);
         if (deleteAccount.isEmpty()) {
             throw new IllegalStateException(
-                    "student with id " + email + " does not exist"
+                    "User with id " + email + " does not exist"
             );
         }
         userRepository.deleteById(deleteAccount.get().getId());
     }
 
     @Transactional
-    public User updateAccount(User user) {
+    public User updateUser(UserRequest request) {
+        User user = userMapper.toUser(request);
         User updateUser = userRepository.findByEmail(user.getEmail())
                 .orElseThrow(() -> new IllegalStateException(
-                        "student with email " + user.getEmail() + " does not exist"
+                        "User with email " + user.getEmail() + " does not exist"
                 ));
 
         setRole(user, updateUser);
