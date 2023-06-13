@@ -40,12 +40,12 @@ public class AuthController {
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
         logger.info("Auth Request");
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+                new UsernamePasswordAuthenticationToken(loginRequest.username(), loginRequest.password()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(authentication);
         logger.info("JWT Token: " + jwt);
-
+        logger.info("User " + loginRequest.username() + " authenticated");
         return ResponseEntity.ok()
                 .header(HttpHeaders.AUTHORIZATION, jwt)
                 .build();
@@ -53,11 +53,7 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody UserRequest request) {
-        try {
-            userService.addUser(request);
-        } catch (IllegalStateException e) {
-            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
-        }
+        userService.addUser(request);
 
         return ResponseEntity.ok().body("User registered successfully!");
     }

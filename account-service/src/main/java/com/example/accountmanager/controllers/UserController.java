@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -21,14 +22,14 @@ public class UserController {
     private final UserMapper userMapper;
 
     @Autowired
-    public UserController(UserService userService, UserMapper userMapper){
+    public UserController(UserService userService, UserMapper userMapper) {
         this.userService = userService;
         this.userMapper = userMapper;
     }
 
     @GetMapping("/")
     @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
-    public ResponseEntity<List<UserResponse>> getUsers(){
+    public ResponseEntity<List<UserResponse>> getUsers() {
         List<UserResponse> userResponses = userService
                 .getUsers()
                 .stream()
@@ -40,15 +41,14 @@ public class UserController {
 
     @PostMapping("/")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<UserResponse> addUser(@RequestBody UserRequest request){
+    public ResponseEntity<UserResponse> addUser(@RequestBody UserRequest request) {
         UserResponse userResponse = userMapper.toResponse(userService.addUser(request));
-
         return new ResponseEntity<>(userResponse, HttpStatus.CREATED);
     }
 
     @PutMapping("/")
     @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
-    public ResponseEntity<UserResponse> updateUser(@RequestBody UserRequest request){
+    public ResponseEntity<UserResponse> updateUser(@RequestBody UserRequest request) {
         UserResponse userResponse = userMapper.toResponse(userService.updateUser(request));
 
         return new ResponseEntity<>(userResponse, HttpStatus.OK);
@@ -56,7 +56,7 @@ public class UserController {
 
     @DeleteMapping("{email}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> deleteUser(@PathVariable("email") String email){
+    public ResponseEntity<?> deleteUser(@PathVariable("email") String email) {
         userService.deleteUser(email);
 
         return new ResponseEntity<>(HttpStatus.OK);
