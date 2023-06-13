@@ -5,12 +5,10 @@ import com.example.accountmanager.payload.response.UserResponse;
 import com.example.accountmanager.model.account.User;
 import org.springframework.stereotype.Service;
 
-import java.util.function.Function;
-
 @Service
 public final class UserMapper {
 
-    public UserResponse toResponse(User user){
+    public UserResponse toResponse(User user) {
         return new UserResponse(
                 user.getId(),
                 user.getRoles(),
@@ -23,7 +21,7 @@ public final class UserMapper {
         );
     }
 
-    public User toUser(UserRequest request){
+    public User toUser(UserRequest request) {
         return new User(
                 request.username(),
                 request.name(),

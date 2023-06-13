@@ -5,12 +5,18 @@ import com.example.accountmanager.mapper.UserMapper;
 import com.example.accountmanager.model.account.User;
 import com.example.accountmanager.model.account.UserRepository;
 import com.example.accountmanager.payload.request.UserRequest;
+import com.example.accountmanager.role.ERole;
+import com.example.accountmanager.role.Role;
+import com.example.accountmanager.role.RoleRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
+
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,23 +25,14 @@ public class UserService {
 
     Logger logger = LoggerFactory.getLogger(UserService.class);
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final UserMapper userMapper;
 
     @Autowired
-    public UserService(UserRepository userRepository, UserMapper userMapper) {
+    public UserService(UserRepository userRepository, RoleRepository roleRepository, UserMapper userMapper) {
         this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
         this.userMapper = userMapper;
-    }
-
-    public boolean login(User user){
-        Optional<User> accountExists = userRepository.findByEmail(user.getEmail());
-        if (accountExists.isPresent()){
-            String password = accountExists.get().getPassword();
-            if (user.getPassword().equals(password)){
-                return true;
-            }
-        }
-        throw new IllegalStateException("incorrect username or password");
     }
 
     public List<User> getUsers() {
@@ -47,14 +44,25 @@ public class UserService {
         return account.orElse(null);
     }
 
-    public User addUser(UserRequest request) {
-        User user = userMapper.toUser(request);
-        Optional<User> accountByEmail = userRepository.findByEmail(user.getEmail());
-        if (accountByEmail.isPresent()) {
-            throw new IllegalStateException("email taken");
+    public User addUser(UserRequest request) throws IllegalStateException {
+        logger.info("Adding new user");
+        if (userRepository.existsByUsername(request.username())) {
+            logger.info("Username: " + request.username() + ", already taken!");
+            throw new IllegalStateException("Username already taken!");
+        }
+        if (userRepository.existsByEmail(request.email())) {
+            logger.info("Email: " + request.email() + ",already taken");
+            throw new IllegalStateException("Email already taken!");
         }
 
+        User user = userMapper.toUser(request);
+        if (user.getRoles().isEmpty()) {
+            Role role = roleRepository.findByName(ERole.ROLE_USER)
+                    .orElseThrow(() -> new IllegalArgumentException("Role user not found!"));
+            user.setRoles(new HashSet<>(Collections.singleton(role)));
+        }
         userRepository.save(user);
+        logger.info("New user has been added");
 
         return user;
     }
@@ -78,7 +86,9 @@ public class UserService {
                 ));
 
         setRole(user, updateUser);
+
         setName(user, updateUser);
+        setUserName(user, updateUser);
         setEmail(user, updateUser);
         setAddress(user, updateUser);
         setDateOfBirth(user, updateUser);
@@ -116,8 +126,25 @@ public class UserService {
         }
     }
 
+    private void setUserName(User user, User updateUser) {
+        if (user.getUsername().equals("") || user.getUsername().equals(updateUser.getUsername())) {
+            return;
+        }
+
+        if (user.getUsername() != null &&
+                user.getUsername().length() > 0) {
+            Optional<User> userByUserName = userRepository.findByUsername(user.getUsername());
+            if (userByUserName.isPresent()) {
+                if (userByUserName.get().getId() != updateUser.getId()) {
+                    throw new IllegalStateException("username taken");
+                }
+            }
+            updateUser.setUsername(user.getUsername());
+        }
+    }
+
     private void setAddress(User user, User updateUser) {
-        if (user.getAddress().equals(updateUser.getAddress())){
+        if (user.getAddress().equals(updateUser.getAddress())) {
             return;
         }
 
@@ -131,9 +158,9 @@ public class UserService {
 
         if (user.getEmail() != null &&
                 user.getEmail().length() > 0) {
-            Optional<User> studentByMail = userRepository.findByEmail(user.getEmail());
-            if (studentByMail.isPresent()) {
-                if (studentByMail.get().getId() != updateUser.getId()){
+            Optional<User> userByMail = userRepository.findByEmail(user.getEmail());
+            if (userByMail.isPresent()) {
+                if (userByMail.get().getId() != updateUser.getId()) {
                     throw new IllegalStateException("email taken");
                 }
             }

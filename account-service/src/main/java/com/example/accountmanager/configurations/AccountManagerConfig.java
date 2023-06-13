@@ -1,11 +1,11 @@
 package com.example.accountmanager.configurations;
 
-import com.example.accountmanager.controllers.AuthController;
+import com.example.accountmanager.controllers.UserController;
 import com.example.accountmanager.datatypes.Address;
 import com.example.accountmanager.datatypes.Name;
 import com.example.accountmanager.model.account.User;
 import com.example.accountmanager.model.account.UserRepository;
-import com.example.accountmanager.payload.request.SignupRequest;
+import com.example.accountmanager.payload.request.UserRequest;
 import com.example.accountmanager.role.ERole;
 import com.example.accountmanager.role.Role;
 import com.example.accountmanager.role.RoleRepository;
@@ -28,7 +28,7 @@ public class AccountManagerConfig {
     private UserRepository userRepository;
 
     @Bean
-    CommandLineRunner commandLineRunner(AuthController controller) {
+    CommandLineRunner commandLineRunner(UserController controller) {
         return args -> {
             for (ERole role : ERole.values()) {
                 Optional<Role> roleExists = roleRepository.findByName(role);
@@ -47,35 +47,37 @@ public class AccountManagerConfig {
                 if (adminAccounts.isEmpty()) {
                     Name name = new Name("Jürgen", "Moroskow");
                     Address address = new Address("Admincity", "Adminstreet 14", 1413914);
-                    Set<String> roles = new HashSet<>(Collections.singletonList("admin"));
+                    Set<Role> roles = new HashSet<>(Collections.singletonList(role.get()));
 
-                    SignupRequest request = new SignupRequest();
-                    request.setRoles(roles);
-                    request.setUsername("Admin");
-                    request.setName(name);
-                    request.setAddress(address);
-                    request.setEmail("www.admin@basic.com");
-                    request.setDob(LocalDate.of(1989, Month.SEPTEMBER, 27));
-                    request.setPhoneNumber("081512345");
-                    request.setPassword("Admin!");
+                    UserRequest request = new UserRequest(
+                            roles,
+                            "Admin",
+                            name,
+                            address,
+                            "www.admin@basic.com",
+                            LocalDate.of(1989, Month.SEPTEMBER, 27),
+                            "081512345",
+                            "Admin!"
+                    );
 
-                    controller.registerUser(request);
+                    controller.addUser(request);
 
                     name = new Name("Max", "Mustermann");
                     address = new Address("Admincity1", "Adminstreet 15", 1413915);
-                    roles = new HashSet<>(Collections.singletonList("admin"));
+                    roles = new HashSet<>(Collections.singletonList(role.get()));
 
-                    request = new SignupRequest();
-                    request.setRoles(roles);
-                    request.setUsername("Admin2");
-                    request.setName(name);
-                    request.setAddress(address);
-                    request.setEmail("www.admin@basic2.com");
-                    request.setDob(LocalDate.of(1989, Month.SEPTEMBER, 27));
-                    request.setPhoneNumber("081512345");
-                    request.setPassword("Admin!");
+                    request = new UserRequest(
+                            roles,
+                            "Admin2",
+                            name,
+                            address,
+                            "www.admin@basic2.com",
+                            LocalDate.of(1989, Month.SEPTEMBER, 27),
+                            "081512345",
+                            "Admin!"
+                    );
 
-                    controller.registerUser(request);
+                    controller.addUser(request);
                 }
             }
         };
