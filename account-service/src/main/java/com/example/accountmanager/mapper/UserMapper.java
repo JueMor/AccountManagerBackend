@@ -22,7 +22,7 @@ public final class UserMapper {
     }
 
     public User toUser(UserRequest request) {
-        return new User(
+        User user = new User(
                 request.username(),
                 request.name(),
                 request.address(),
@@ -31,5 +31,11 @@ public final class UserMapper {
                 request.phoneNumber(),
                 request.password()
         );
+
+        if (!request.roles().isEmpty()){
+            user.setRoles(request.roles());
+        }
+
+        return user;
     }
 }

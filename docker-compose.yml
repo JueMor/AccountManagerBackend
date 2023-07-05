@@ -38,7 +38,7 @@ services:
       - zipkin
   account-manager-db:
     image: mysql
-    expose:
+    ports:
       - 3306
     environment:
       - MYSQL_DATABASE=neon

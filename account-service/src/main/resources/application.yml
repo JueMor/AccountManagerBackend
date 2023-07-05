@@ -9,6 +9,15 @@ eureka:
     prefer-ip-address: true
 
 logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG
+        web:
+          servlet:
+            mvc:
+              method:
+                annotation: DEBUG
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%X{traceId:-},%X{spanId:-}] ${LOG_LEVEL_PATTERN:-%5p} %m%n"
 

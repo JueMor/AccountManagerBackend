@@ -2,7 +2,6 @@ package com.example.accountmanager.security.services;
 
 import com.example.accountmanager.datatypes.Name;
 import com.example.accountmanager.model.account.User;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,26 +14,39 @@ import java.util.stream.Collectors;
 public class UserDetailsImpl implements UserDetails {
     private static final long serialVersionUID = 1L;
 
-    private Long id;
+    private final Long id;
 
-    private String username;
+    private final String username;
 
-    private Name name;
+    private final Name name;
 
-    private String email;
+    private final String email;
 
-    private String password;
+    private final String password;
 
-    private Collection<? extends GrantedAuthority> authorities;
+    private final Collection<? extends GrantedAuthority> authorities;
+
+    private final boolean accountNonExpired;
+    private final boolean accountNonLocked;
+    private final boolean credentialsNonExpired;
+    private final boolean enabled;
 
     public UserDetailsImpl(Long id, String username, Name name, String email, String password,
-                           Collection<? extends GrantedAuthority> authorities) {
+                           Collection<? extends GrantedAuthority> authorities,
+                           boolean accountNonExpired,
+                           boolean accountNonLocked,
+                           boolean credentialsNonExpired,
+                           boolean enabled) {
         this.id = id;
         this.username = username;
         this.name = name;
         this.email = email;
         this.password = password;
         this.authorities = authorities;
+        this.accountNonExpired = accountNonExpired;
+        this.accountNonLocked = accountNonLocked;
+        this.credentialsNonExpired = credentialsNonExpired;
+        this.enabled = enabled;
     }
 
     public static UserDetailsImpl build(User user) {
@@ -48,7 +60,11 @@ public class UserDetailsImpl implements UserDetails {
                 user.getName(),
                 user.getEmail(),
                 user.getPassword(),
-                authorities
+                authorities,
+                user.getAuthorized().isAccountNonExpired(),
+                user.getAuthorized().isAccountNonLocked(),
+                user.getAuthorized().isCredentialsNonExpired(),
+                user.getAuthorized().isEnabled()
         );
     }
 
@@ -57,7 +73,7 @@ public class UserDetailsImpl implements UserDetails {
         return authorities;
     }
 
-    public Long getId() {
+    public Long id() {
         return id;
     }
 
@@ -81,22 +97,22 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return true;
+        return accountNonExpired;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return accountNonLocked;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true;
+        return credentialsNonExpired;
     }
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return enabled;
     }
 
     @Override

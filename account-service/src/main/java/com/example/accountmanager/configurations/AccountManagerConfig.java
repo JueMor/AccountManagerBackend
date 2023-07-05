@@ -1,6 +1,5 @@
 package com.example.accountmanager.configurations;
 
-import com.example.accountmanager.controllers.UserController;
 import com.example.accountmanager.datatypes.Address;
 import com.example.accountmanager.datatypes.Name;
 import com.example.accountmanager.model.account.User;
@@ -9,6 +8,7 @@ import com.example.accountmanager.payload.request.UserRequest;
 import com.example.accountmanager.role.ERole;
 import com.example.accountmanager.role.Role;
 import com.example.accountmanager.role.RoleRepository;
+import com.example.accountmanager.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -28,7 +28,7 @@ public class AccountManagerConfig {
     private UserRepository userRepository;
 
     @Bean
-    CommandLineRunner commandLineRunner(UserController controller) {
+    CommandLineRunner commandLineRunner(UserService service) {
         return args -> {
             for (ERole role : ERole.values()) {
                 Optional<Role> roleExists = roleRepository.findByName(role);
@@ -60,7 +60,7 @@ public class AccountManagerConfig {
                             "Admin!"
                     );
 
-                    controller.addUser(request);
+                    service.addUser(request);
 
                     name = new Name("Max", "Mustermann");
                     address = new Address("Admincity1", "Adminstreet 15", 1413915);
@@ -77,7 +77,7 @@ public class AccountManagerConfig {
                             "Admin!"
                     );
 
-                    controller.addUser(request);
+                    service.addUser(request);
                 }
             }
         };

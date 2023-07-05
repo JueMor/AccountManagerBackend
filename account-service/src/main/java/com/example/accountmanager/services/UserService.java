@@ -4,6 +4,8 @@ import com.example.accountmanager.datatypes.Name;
 import com.example.accountmanager.mapper.UserMapper;
 import com.example.accountmanager.model.account.User;
 import com.example.accountmanager.model.account.UserRepository;
+import com.example.accountmanager.model.account.authorized.Authorized;
+import com.example.accountmanager.model.account.authorized.AuthorizedRepository;
 import com.example.accountmanager.payload.request.UserRequest;
 import com.example.accountmanager.role.ERole;
 import com.example.accountmanager.role.Role;
@@ -11,6 +13,7 @@ import com.example.accountmanager.role.RoleRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
@@ -25,14 +28,22 @@ public class UserService {
 
     Logger logger = LoggerFactory.getLogger(UserService.class);
     private final UserRepository userRepository;
+    private final AuthorizedRepository authorizedRepository;
     private final RoleRepository roleRepository;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService(UserRepository userRepository, RoleRepository roleRepository, UserMapper userMapper) {
+    public UserService(UserRepository userRepository,
+                       AuthorizedRepository authorizedRepository,
+                       RoleRepository roleRepository,
+                       UserMapper userMapper,
+                       PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.authorizedRepository = authorizedRepository;
         this.roleRepository = roleRepository;
         this.userMapper = userMapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public List<User> getUsers() {
@@ -61,7 +72,16 @@ public class UserService {
                     .orElseThrow(() -> new IllegalArgumentException("Role user not found!"));
             user.setRoles(new HashSet<>(Collections.singleton(role)));
         }
+
+        //Encode password
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        Authorized authorized = new Authorized();
+        user.setAuthorized(authorized);
+        authorized.setUser(user);
+
         userRepository.save(user);
+        authorizedRepository.save(authorized);
         logger.info("New user has been added");
 
         return user;
@@ -71,7 +91,7 @@ public class UserService {
         Optional<User> deleteAccount = userRepository.findByEmail(email);
         if (deleteAccount.isEmpty()) {
             throw new IllegalStateException(
-                    "User with id " + email + " does not exist"
+                    "User with email \"" + email + "\" does not exist"
             );
         }
         userRepository.deleteById(deleteAccount.get().getId());
@@ -98,15 +118,11 @@ public class UserService {
     }
 
     private void setRole(User user, User updateUser) {
-        /*if (account.getRole().equals("")) {
+        if (user.getRoles().isEmpty()) {
             return;
         }
 
-        if (!account.getRole().matches("User|Admin")) {
-            throw new IllegalStateException("role must be set to: User, Admin");
-        }
-
-        updateAccount.setRole(account.getRole());*/
+        updateUser.setRoles(user.getRoles());
     }
 
     private void setName(User user, User updateUser) {
@@ -179,4 +195,6 @@ public class UserService {
     private void setPassword(User user, User updateUser) {
         updateUser.setPassword(user.getPassword());
     }
+
+
 }

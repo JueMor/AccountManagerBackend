@@ -3,6 +3,7 @@ package com.example.accountmanager.model.account;
 import com.example.accountmanager.datatypes.Address;
 import com.example.accountmanager.datatypes.HideId;
 import com.example.accountmanager.datatypes.Name;
+import com.example.accountmanager.model.account.authorized.Authorized;
 import com.example.accountmanager.role.Role;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -10,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.Period;
@@ -28,8 +30,8 @@ public class User implements Serializable, HideId {
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_roles",
-    joinColumns = @JoinColumn(name = "user_id"),
-    inverseJoinColumns = @JoinColumn(name = "role_id"))
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
     @Column(name = "USER_NAME", unique = true, nullable = false)
@@ -55,10 +57,21 @@ public class User implements Serializable, HideId {
     @Column(length = 1000)
     private String password;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @JoinColumn(name = "authorized_id")
+    private Authorized authorized;
+
     public User() {
     }
 
-    public User(String username, Name name, Address address, String email, LocalDate dob, String phoneNumber, String password) {
+    public User(String username,
+                Name name,
+                Address address,
+                String email,
+                LocalDate dob,
+                String phoneNumber,
+                String password) {
+        this();
         this.username = username;
         this.name = name;
         this.address = address;
@@ -144,6 +157,14 @@ public class User implements Serializable, HideId {
 
     public int getAge() {
         return Period.between(this.dob, LocalDate.now()).getYears();
+    }
+
+    public void setAuthorized(Authorized authorized) {
+        this.authorized = authorized;
+    }
+
+    public Authorized getAuthorized() {
+        return authorized;
     }
 
     @Override

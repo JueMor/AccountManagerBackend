@@ -1,5 +1,6 @@
 package com.example.accountmanager.security.services.jwt;
 
+import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import com.example.accountmanager.security.services.UserDetailsServiceImpl;
@@ -16,25 +17,31 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 
 @Component
 public class AuthTokenFilter extends OncePerRequestFilter {
     private static final Logger logger = LoggerFactory.getLogger(AuthTokenFilter.class);
+    private final JwtUtils jwtUtils;
+    private final UserDetailsServiceImpl userDetailsService;
 
     @Autowired
-    private JwtUtils jwtUtils;
-
-    @Autowired
-    private UserDetailsServiceImpl userDetailsService;
+    public AuthTokenFilter(JwtUtils jwtUtils,
+                           UserDetailsServiceImpl userDetailsService) {
+        this.jwtUtils = jwtUtils;
+        this.userDetailsService = userDetailsService;
+    }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(@NotNull HttpServletRequest request,
+                                    @NotNull HttpServletResponse response,
+                                    @NotNull FilterChain filterChain) throws ServletException, IOException {
         try {
             logger.info("Request " + request);
             String jwt = parseJwt(request);
             logger.info("Token " + jwt);
-            if(jwt != null && jwtUtils.validateToken(jwt)){
+            if (jwt != null && jwtUtils.validateToken(jwt)) {
                 String username = jwtUtils.getUserNameFromJwtToken(jwt);
 
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
@@ -44,17 +51,17 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             logger.error("Cannot set user authentication: " + e);
         }
 
         filterChain.doFilter(request, response);
     }
 
-    private String parseJwt(HttpServletRequest request){
+    private String parseJwt(HttpServletRequest request) {
         String headerAuth = request.getHeader("Authorization");
 
-        if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")){
+        if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {
             return headerAuth.substring(7);
         }
 
